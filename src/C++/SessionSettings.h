@@ -125,6 +125,7 @@ const char REFRESH_ON_LOGON[] = "RefreshOnLogon";
 const char MILLISECONDS_IN_TIMESTAMP[] = "MillisecondsInTimeStamp";
 const char HTTP_ACCEPT_PORT[] = "HttpAcceptPort";
 const char PERSIST_MESSAGES[] = "PersistMessages";
+const char POSSIBLE_BUSYWAIT_IN_APPCALLBACK[] = "PossibleBusyWaitInAppCalback";
 
 /// Container for setting dictionaries mapped to sessions.
 class SessionSettings

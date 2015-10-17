@@ -27,6 +27,7 @@
 #include "quickfix/SocketInitiator.h"
 #include "quickfix/SessionSettings.h"
 #include "quickfix/Log.h"
+#include "quickfix/FileLog.h"
 #include "Application.h"
 #include <string>
 #include <iostream>
@@ -49,8 +50,10 @@ int main( int argc, char** argv )
     FIX::SessionSettings settings( file );
 
     Application application;
+    application.setSenderCompId(settings.get().getString("ClientID"));
+    application.setTargetCompId(settings.get().getString("ServerID"));
     FIX::FileStoreFactory storeFactory( settings );
-    FIX::ScreenLogFactory logFactory( settings );
+    FIX::FileLogFactory logFactory( settings );
     FIX::SocketInitiator initiator( application, storeFactory, settings, logFactory );
 
     initiator.start();

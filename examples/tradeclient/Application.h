@@ -65,6 +65,7 @@
 #include "quickfix/fix50/OrderCancelReject.h"
 #include "quickfix/fix50/OrderCancelReplaceRequest.h"
 #include "quickfix/fix50/MarketDataRequest.h"
+#include "quickfix/fix50sp2/ApplicationMessageRequest.h"
 
 #include <queue>
 
@@ -74,7 +75,12 @@ class Application :
 {
 public:
   void run();
-
+  void setTargetCompId(std::string target) {
+    m_targetCompId = target;
+  }
+  void setSenderCompId(std::string sender) {
+    m_senderCompId = sender;
+  }
 private:
   void onCreate( const FIX::SessionID& ) {}
   void onLogon( const FIX::SessionID& sessionID );
@@ -99,11 +105,13 @@ private:
   void onMessage( const FIX44::OrderCancelReject&, const FIX::SessionID& );
   void onMessage( const FIX50::ExecutionReport&, const FIX::SessionID& );
   void onMessage( const FIX50::OrderCancelReject&, const FIX::SessionID& );
+  void onMessage( const FIX50SP2::ExecutionReport&, const FIX::SessionID& );
 
   void queryEnterOrder();
   void queryCancelOrder();
   void queryReplaceOrder();
   void queryMarketDataRequest();
+  void queryApplicationMessageRequest();
 
   FIX40::NewOrderSingle queryNewOrderSingle40();
   FIX41::NewOrderSingle queryNewOrderSingle41();
@@ -126,6 +134,7 @@ private:
   FIX43::MarketDataRequest queryMarketDataRequest43();
   FIX44::MarketDataRequest queryMarketDataRequest44();
   FIX50::MarketDataRequest queryMarketDataRequest50();
+  FIX50SP2::ApplicationMessageRequest queryApplicationMessageRequest50SP2();
 
   void queryHeader( FIX::Header& header );
   char queryAction();
@@ -144,6 +153,9 @@ private:
   FIX::Price queryPrice();
   FIX::StopPx queryStopPx();
   FIX::TimeInForce queryTimeInForce();
+
+  std::string m_targetCompId;
+  std::string m_senderCompId;
 };
 
 #endif

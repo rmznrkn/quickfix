@@ -64,7 +64,8 @@ Session::Session( Application& application,
   m_dataDictionaryProvider( dataDictionaryProvider ),
   m_messageStoreFactory( messageStoreFactory ),
   m_pLogFactory( pLogFactory ),
-  m_pResponder( 0 )
+  m_pResponder( 0 ),
+  m_possibleBusyWaitInCalbacks( false )
 {
   m_state.heartBtInt( heartBtInt );
   m_state.initiate( heartBtInt != 0 );
@@ -1345,7 +1346,7 @@ void Session::next( const Message& message, const UtcTimeStamp& timeStamp, bool 
     nextQueued( timeStamp );
 
   if( isLoggedOn() )
-    next(false);
+    next( !m_possibleBusyWaitInCalbacks );
 }
 
 bool Session::sendToTarget( Message& message, const std::string& qualifier )

@@ -194,6 +194,11 @@ public:
   void setValidateLengthAndChecksum ( bool value )
     { m_validateLengthAndChecksum = value; }
 
+  bool getPossibleBusyWaitInCalbacks()
+    { return m_possibleBusyWaitInCalbacks; }
+  void setPossibleBusyWaitInCalbacks( bool value )
+    { m_possibleBusyWaitInCalbacks = value; }
+
   void setResponder( Responder* pR )
   {
     if( !checkSessionTime(UtcTimeStamp()) )
@@ -316,6 +321,7 @@ private:
   bool m_millisecondsInTimeStamp;
   bool m_persistMessages;
   bool m_validateLengthAndChecksum;
+  bool m_possibleBusyWaitInCalbacks;
 
   SessionState m_state;
   DataDictionaryProvider m_dataDictionaryProvider;

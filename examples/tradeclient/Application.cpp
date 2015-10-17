@@ -28,7 +28,7 @@
 #include "Application.h"
 #include "quickfix/Session.h"
 #include <iostream>
-
+static long incomingMessageCount = 0;
 void Application::onLogon( const FIX::SessionID& sessionID )
 {
   std::cout << std::endl << "Logon - " << sessionID << std::endl;
@@ -43,7 +43,7 @@ void Application::fromApp( const FIX::Message& message, const FIX::SessionID& se
 throw( FIX::FieldNotFound, FIX::IncorrectDataFormat, FIX::IncorrectTagValue, FIX::UnsupportedMessageType )
 {
   crack( message, sessionID );
-  std::cout << std::endl << "IN: " << message << std::endl;
+  std::cout << std::endl << "InMessage(" << ++incomingMessageCount << ")" << message << std::endl;
 }
 
 void Application::toApp( FIX::Message& message, const FIX::SessionID& sessionID )
@@ -85,6 +85,8 @@ void Application::onMessage
 ( const FIX50::ExecutionReport&, const FIX::SessionID& ) {}
 void Application::onMessage
 ( const FIX50::OrderCancelReject&, const FIX::SessionID& ) {}
+void  Application::onMessage
+( const FIX50SP2::ExecutionReport&, const FIX::SessionID& ) {}
 
 void Application::run()
 {
@@ -103,6 +105,8 @@ void Application::run()
       else if ( action == '4' )
         queryMarketDataRequest();
       else if ( action == '5' )
+        queryApplicationMessageRequest();
+      else if ( action == '6' )
         break;
     }
     catch ( std::exception & e )
@@ -235,6 +239,14 @@ void Application::queryMarketDataRequest()
     break;
   }
 
+  FIX::Session::sendToTarget( md );
+}
+
+void Application::queryApplicationMessageRequest()
+{
+  incomingMessageCount = 0;
+  std::cout << "\nApplicationMessageRequest\n";
+  FIX::Message md = queryApplicationMessageRequest50SP2();
   FIX::Session::sendToTarget( md );
 }
 
@@ -592,6 +604,13 @@ FIX50::MarketDataRequest Application::queryMarketDataRequest50()
   return message;
 }
 
+FIX50SP2::ApplicationMessageRequest Application::queryApplicationMessageRequest50SP2() {
+  FIX50SP2::ApplicationMessageRequest request;
+  request.getHeader().setField(FIX::SenderCompID(m_senderCompId));
+  request.getHeader().setField(FIX::TargetCompID(m_targetCompId));
+  return request;
+}
+
 void Application::queryHeader( FIX::Header& header )
 {
   header.setField( querySenderCompID() );
@@ -609,12 +628,13 @@ char Application::queryAction()
   << "2) Cancel Order" << std::endl
   << "3) Replace Order" << std::endl
   << "4) Market data test" << std::endl
-  << "5) Quit" << std::endl
+  << "5) ApplicationMessageRequest(Data download)" << std::endl
+  << "6) Quit" << std::endl
   << "Action: ";
   std::cin >> value;
   switch ( value )
   {
-    case '1': case '2': case '3': case '4': case '5': break;
+    case '1': case '2': case '3': case '4': case '5': case '6': break;
     default: throw std::exception();
   }
   return value;

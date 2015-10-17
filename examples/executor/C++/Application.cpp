@@ -32,6 +32,7 @@
 #include "quickfix/fix43/ExecutionReport.h"
 #include "quickfix/fix44/ExecutionReport.h"
 #include "quickfix/fix50/ExecutionReport.h"
+#include "quickfix/fix50sp2/ExecutionReport.h"
 
 void Application::onCreate( const FIX::SessionID& sessionID ) {}
 void Application::onLogon( const FIX::SessionID& sessionID ) {}
@@ -50,6 +51,40 @@ void Application::fromApp( const FIX::Message& message,
                            const FIX::SessionID& sessionID )
 throw( FIX::FieldNotFound, FIX::IncorrectDataFormat, FIX::IncorrectTagValue, FIX::UnsupportedMessageType )
 { crack( message, sessionID ); }
+
+bool timedOut(const FIX::UtcTimeStamp &startTime, const long interval)
+{
+  FIX::UtcTimeStamp now;
+  return ( now - startTime ) >= ( interval );
+}
+
+void Application::onMessage( const FIX50SP2::ApplicationMessageRequest& message,
+                             const FIX::SessionID& sessionID )
+{
+
+  FIX50SP2::ExecutionReport executionReport;
+  try
+  {
+    FIX::Session *pSession = FIX::Session::lookupSession(sessionID);
+    FIX::UtcTimeStamp startTime;
+
+    std::cout << "Session( " << sessionID << ").onMessage ( order): "
+        << " PossibleLongCallback= " << pSession->getPossibleBusyWaitInCalbacks() << std::endl;
+    std::cout << "Start time = " << FIX::UtcTimeStampConvertor::convert(startTime, true) << std::endl;
+
+    while (!timedOut(startTime, m_expectedDownloadLatency)) {
+      usleep(500000);
+      executionReport.set( FIX::ExecID(genExecID()) );
+      FIX::Session::sendToTarget( executionReport, sessionID );
+    }
+
+    FIX::UtcTimeStamp endTime;
+    std::cout << "End time   = " << FIX::UtcTimeStampConvertor::convert(endTime, true) << std::endl;
+  }
+  catch ( std::exception& ex) {
+    std::cout << "ApplicationMessageRequest handling failed: " << ex.what() << std::endl;
+  }
+}
 
 void Application::onMessage( const FIX40::NewOrderSingle& message,
                              const FIX::SessionID& sessionID )

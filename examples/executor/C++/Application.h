@@ -34,6 +34,7 @@
 #include "quickfix/fix43/NewOrderSingle.h"
 #include "quickfix/fix44/NewOrderSingle.h"
 #include "quickfix/fix50/NewOrderSingle.h"
+#include "quickfix/fix50sp2/ApplicationMessageRequest.h"
 
 class Application
 : public FIX::Application, public FIX::MessageCracker
@@ -54,6 +55,7 @@ public:
     throw( FIX::FieldNotFound, FIX::IncorrectDataFormat, FIX::IncorrectTagValue, FIX::UnsupportedMessageType );
 
   // MessageCracker overloads
+  void onMessage( const FIX50SP2::ApplicationMessageRequest&, const FIX::SessionID& );
   void onMessage( const FIX40::NewOrderSingle&, const FIX::SessionID& );
   void onMessage( const FIX41::NewOrderSingle&, const FIX::SessionID& );
   void onMessage( const FIX42::NewOrderSingle&, const FIX::SessionID& );
@@ -71,8 +73,12 @@ public:
     stream << ++m_execID;
     return stream.str();
   }
+  void setExpectedDownloadLatency(long value) {
+    m_expectedDownloadLatency = value;
+  }
 private:
   int m_orderID, m_execID;
+  long m_expectedDownloadLatency;
 };
 
 #endif

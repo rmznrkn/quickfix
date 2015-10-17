@@ -26,6 +26,7 @@
 #include "quickfix/FileStore.h"
 #include "quickfix/ThreadedSocketAcceptor.h"
 #include "quickfix/Log.h"
+#include "quickfix/FileLog.h"
 #include "quickfix/SessionSettings.h"
 #include "Application.h"
 #include <string>
@@ -56,8 +57,9 @@ int main( int argc, char** argv )
     FIX::SessionSettings settings( file );
 
     Application application;
+    application.setExpectedDownloadLatency(settings.get().getInt("ExpectedDownloadLatency"));
     FIX::FileStoreFactory storeFactory( settings );
-    FIX::ScreenLogFactory logFactory( settings );
+    FIX::FileLogFactory logFactory( settings );
     FIX::ThreadedSocketAcceptor acceptor( application, storeFactory, settings, logFactory );
 
     acceptor.start();
