@@ -122,12 +122,12 @@ void Session::fill( Header& header )
   insertSendingTime( header );
 }
 
-void Session::next(bool forceLogoutWhenTimeOut)
+void Session::next(bool closeConnectionIfHeartbeatTimedOut)
 {
-  next( UtcTimeStamp(), forceLogoutWhenTimeOut );
+  next( UtcTimeStamp(), closeConnectionIfHeartbeatTimedOut );
 }
 
-void Session::next( const UtcTimeStamp& timeStamp, bool forceLogoutWhenTimeOut)
+void Session::next( const UtcTimeStamp& timeStamp, bool closeConnectionIfHeartbeatTimedOut)
 {
   try
   {
@@ -173,7 +173,7 @@ void Session::next( const UtcTimeStamp& timeStamp, bool forceLogoutWhenTimeOut)
 
     if ( m_state.withinHeartBeat() ) return ;
 
-    if ( m_state.timedOut() && forceLogoutWhenTimeOut )
+    if ( m_state.timedOut() && closeConnectionIfHeartbeatTimedOut )
     {
       m_state.onEvent( "Timed out waiting for heartbeat" );
       disconnect();

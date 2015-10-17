@@ -202,8 +202,8 @@ public:
   }
 
   bool send( Message& );
-  void next(bool forceLogoutWhenTimeOut = true);
-  void next( const UtcTimeStamp& timeStamp, bool forceLogoutWhenTimeOut = true);
+  void next(bool closeConnectionIfHeartbeatTimedOut = true);
+  void next( const UtcTimeStamp& timeStamp, bool closeConnectionIfHeartbeatTimedOut = true);
   void next( const std::string&, const UtcTimeStamp& timeStamp, bool queued = false );
   void next( const Message&, const UtcTimeStamp& timeStamp, bool queued = false );
   void disconnect();
